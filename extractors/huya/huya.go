@@ -22,7 +22,10 @@ func New() extractors.Extractor {
 }
 
 func (e *extractor) Extract(url string, option extractors.Options) ([]*extractors.Data, error) {
-	html, err := request.Get(url, url, nil)
+	headers := map[string]string{}
+	headers["Referer"] = "https://www.huya.com"
+	headers["User-Agent"] = "Mozilla/5.0 (Linux; Android 8.0; Pixel 2 Build/OPD3.170816.012) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Mobile Safari/537.36 Edg/87.0.664.66"
+	html, err := request.Get(url, url, headers)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -36,7 +39,7 @@ func (e *extractor) Extract(url string, option extractors.Options) ([]*extractor
 	}
 
 	var videoUrl string
-	videoDesc := utils.MatchOneOf(html, `//videotx-platform.cdn.huya.com/(.*)" poster=(.+?)`)
+	videoDesc := utils.MatchOneOf(html, `src="\/\/.+huya.com\/(.*)" poster=(.+?)`)
 	if len(videoDesc) > 1 {
 		videoUrl = huyaVideoHost + videoDesc[1]
 	} else {
